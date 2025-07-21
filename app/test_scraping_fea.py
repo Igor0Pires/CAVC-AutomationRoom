@@ -1,10 +1,20 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
 from playwright.async_api import async_playwright
 import asyncio
 
-async def execute_script():
+app = FastAPI()
+
+class FormData(BaseModel):
+    name: str
+    email: str
+    message: str
+
+@app.post("/action")
+async def execute_script(data: FormData):
     async with async_playwright() as p:
         # Conectando ao navegador
-        browser = await p.chromium.launch(headless=False)
+        browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
 
         page.set_default_timeout(60000) 
@@ -44,6 +54,9 @@ async def execute_script():
         
         finally:
             await browser.close()
+        return {"result": result,"message": "Script executado com sucesso!", "name": data.name, "email": data.email, "message": data.message}
 
-if __name__ == '__main__':
-    asyncio.run(execute_script())
+if __name__ == "__main__":
+    import uvicorn  
+    uvicorn.run(app)
+
