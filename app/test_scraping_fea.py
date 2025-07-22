@@ -1,18 +1,35 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 from playwright.async_api import async_playwright
+import os
 import asyncio
 
 app = FastAPI()
+
+# Definindo a chave de API
+API_KEY = os.getenv("API_KEY")
+
+if API_KEY is None:
+    print("API_KEY is not set")
+
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=True)
+
+async def get_api_key(api_key: str = Depends(api_key_header)):
+    if api_key == API_KEY:
+        return api_key
+    raise HTTPException(status_code=status.HTTP)
 
 class FormData(BaseModel):
     name: str
     email: str
     message: str
 
+# Executar Scraping
 @app.post("/action")
-async def execute_script(data: FormData):
+async def execute_script(data: FormData, api_key: str = Depends(get_api_key)):
     async with async_playwright() as p:
+
         # Conectando ao navegador
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
