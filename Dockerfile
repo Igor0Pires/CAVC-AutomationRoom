@@ -26,8 +26,14 @@ RUN apt-get update && apt-get install -y \
     libcairo2 \
     libharfbuzz0b \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
-RUN playwright install
+
+RUN playwright install chromium
+RUN playwright install-deps chromium
+
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
 COPY . .
 EXPOSE 8000
-CMD ["uvicorn", "test_scraping_fea:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.test_scraping_fea:app", "--host", "0.0.0.0", "--port", "8000"]
 
