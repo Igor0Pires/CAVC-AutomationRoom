@@ -4,17 +4,19 @@ from pydantic import BaseModel
 from playwright.async_api import async_playwright, FilePayload
 import os
 import asyncio
-from dotenv import load_dotenv
 from datetime import datetime
+import json
+import base64
 
 
 # Charging environment variables from .env file
+from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
 
 # Environment variables
-API_KEY_SECRET = os.getenv("API_KEY")
+API_KEY_SECRET = os.getenv("API_KEY_SECRET")
 LOGIN = os.getenv("LOGIN")
 PASS = os.getenv("PASS")
 
@@ -97,8 +99,7 @@ async def execute_script(
     print(f"Dados do formulário: Nome  Evento={data.eventName}, Email Responsável={data.eventOwnerEmail}")
     
     result_message = "Automação finalizada."
-    result_title = "N/A"
-
+    pdf_base64 = None
     browser = None
 
     async with async_playwright() as p:
@@ -128,52 +129,9 @@ async def execute_script(
             await page.wait_for_selector('#edit-cadastro-area-solicitante')
 
             # Filling the form
-            namesEntList = [
-                "Depto de administração",
-                "Depto de contabilidade e atuária",
-                "Depto de economia",
-                "FIA",
-                "FIPE",
-                "FIPECAFI",
-                "Diretoria",
-                "Assitência acadêmica", # Assitência - corrigido para Assistência se necessário
-                "Assistência administrativa",
-                "STI",
-                "Biblioteca",
-                "Comunicação",
-                "CCINT",
-                "FCC",
-                "FEA Social",
-                "Bateria S/A",
-                "Atlética",
-                "PET",
-                "Cursinho",
-                "CAVC",
-                "FEA Júnior",
-                "FEA Pública",
-                "AIESEC",
-                "Liga de Mercado",
-                "Outros"
-            ]
+            namesEntList = os.getenv("NAMEENTLIST")
 
-            eventTypeList = [
-                "Congresso",
-                "Relato",
-                "Solenidade",
-                "Conferência/Palestra",
-                "Encontro/Fórum",
-                "Treinamento/Aula/Curso",
-                "Seminário",
-                "Prêmio",
-                "Reunião",
-                "Competição de Casos",
-                "Lançamento de Livro",
-                "Workshop/Oficina",
-                "Festival",
-                "Feira",
-                "Extensão",
-                "Outros"
-            ]
+            eventTypeList = os.getenv("Congresso,Relato,Solenidade,Conferência/Palestra,Encontro/Fórum,Treinamento/Aula/Curso,Seminário,Prêmio,Reunião,Competição de Casos,Lançamento de Livro,Workshop/Oficina,Festival,Feira,Extensão,Outros")
             
             # 3 to 3
             # 1. --//--//--
@@ -325,6 +283,7 @@ async def execute_script(
                 
                 if not (len(datesEventList) == len(startTimes) == len(endTimes) == len(spacesNames)):
                     print("Aviso: O número de datas, horários de início, horários de fim e nomes de espaços não coincide.")
+                    raise HTTPException(status_code=400, detail="O número de datas, horários de inicio e de fim não coincide. Verifique os dados enviados.")
 
                 for i in range(len(datesEventList)):
                     # converting dates to the expected format
@@ -378,11 +337,12 @@ async def execute_script(
             print("parte 10 - Done")
 
             # Capturing the response
-            # --- Lógica para fazer upload do PDF no drive ---
-            await page.pdf(path="build/page.pdf", print_background=True)
+            pdf_buffer = await page.pdf(print_background=True)
+            pdf_base64 = base64.b64encode(pdf_buffer).decode('utf-8')
+
             print("PDF da página final gerado com sucesso!")
 
-            return {"status": "success", "message": result_message, "title": result_title, "pdf_status": "PDF gerado com sucesso!"}
+            return {"status": "success", "message": result_message, "pdf_base64": pdf_base64}
         
         except Exception as e:
             print(f"Erro durante a execução: {e}")
@@ -391,7 +351,6 @@ async def execute_script(
             screenshot_base64 = None
             try:
                 scr_bytes = await page.screenshot()
-                import base64
                 screenshot_base64 = base64.b64encode(scr_bytes).decode('utf-8')
                 print('Screenshot de erro capturada com sucesso.')
             except Exception as screenshot_error:
