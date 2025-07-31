@@ -247,7 +247,7 @@ async def execute_script(
                 try:
                     await page.wait_for_selector(file_input_selector_doc, state='attached', timeout=10000)
                     await page.locator(file_input_selector_doc).set_input_files([FilePayload(
-                        name=file_name, mime_type=file_mime_type, buffer=file_content_bytes
+                        name=file_name, mimeType=file_mime_type, buffer=file_content_bytes
                     )])
                     print(f"Arquivo {file_name} enviado com sucesso!")
                 except Exception as file_upload_error:
