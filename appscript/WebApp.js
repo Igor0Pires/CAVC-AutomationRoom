@@ -4,9 +4,9 @@ function doGet(e) {
   const newStatus = e.parameter.status;
 
   // --- Spreadsheet Settings ---
-  const SPREADSHEET_ID = '1ma8h1xL6VSMlI7eIfLRKjQBf-OG5N7pJw2eG5pvvHM0';
-  const SHEET_NAME = 'Respostas ao formulário 1';
-  const LINK_SS = 'https://docs.google.com/spreadsheets/d/1ma8h1xL6VSMlI7eIfLRKjQBf-OG5N7pJw2eG5pvvHM0/edit?'
+  const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty('ID_SHEET_CONTROL');
+  const SHEET_NAME = PropertiesService.getScriptProperties().getProperty('TAB_NAME');
+  const LINK_SS = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?'
 
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName(SHEET_NAME);

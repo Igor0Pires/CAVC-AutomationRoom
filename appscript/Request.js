@@ -1,8 +1,9 @@
-const ID_sheet = '1ma8h1xL6VSMlI7eIfLRKjQBf-OG5N7pJw2eG5pvvHM0';
-const TAB_NAME = 'Respostas ao formulário 1';
-const RENDER_API_URL = 'https://cavc-automationroom.onrender.com/action';
-const DRIVE_FOLDER_ID = '1Rq5UNVvPSWrKC8zDrvv0FdniI7aQbu4G';
-const EMAILRESP = 'igorpires80314@gmail.com'
+const exec = '/test_action';
+const ID_sheet = PropertiesService.getScriptProperties().getProperty('ID_SHEET_CONTROL');
+const TAB_NAME = PropertiesService.getScriptProperties().getProperty('TAB_NAME');
+const RENDER_API_URL = PropertiesService.getScriptProperties().getProperty('RENDER_API_URL') + exec;
+const DRIVE_FOLDER_ID = PropertiesService.getScriptProperties().getProperty('DRIVE_FOLDER_ID');
+const EMAILRESP = PropertiesService.getScriptProperties().getProperty('EMAILRESP')
 
 function request() {
   const API_KEY = PropertiesService.getScriptProperties().getProperty('API_KEY_SECRET');

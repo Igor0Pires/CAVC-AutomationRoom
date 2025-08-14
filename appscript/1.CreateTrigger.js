@@ -1,6 +1,6 @@
 function createFormSubmitTrigger() {
   // --- Execute first ---
-  const ID = '1ma8h1xL6VSMlI7eIfLRKjQBf-OG5N7pJw2eG5pvvHM0';
+  const ID = PropertiesService.getScriptProperties().getProperty('ID_SHEET_CONTROL');
   const SHEET = SpreadsheetApp.openById(ID);
 
   // Check if the trigger already exists

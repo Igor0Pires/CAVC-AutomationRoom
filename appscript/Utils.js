@@ -1,7 +1,8 @@
 function onFormSubmit(e) {
   // --- Setting up spreadsheets ---
-  const ID_PLANILHA = '1ma8h1xL6VSMlI7eIfLRKjQBf-OG5N7pJw2eG5pvvHM0';
-  const NOME_ABA = 'Respostas ao formulário 1';
+  const ID_PLANILHA = PropertiesService.getScriptProperties().getProperty('ID_SHEET_CONTROL');
+
+  const NOME_ABA = PropertiesService.getScriptProperties().getProperty('TAB_NAME');
 
   const planilha = SpreadsheetApp.openById(ID_PLANILHA);
   const sheet = planilha.getSheetByName(NOME_ABA);
@@ -34,13 +35,14 @@ function onFormSubmit(e) {
 
   // --- Getting Emails ---
   const emailResposta = e.namedValues && e.namedValues['Endereço de e-mail'] ? e.namedValues['Endereço de e-mail'][0] : e.responderEmail;
-  const emailResponsavel = "igorpires80314@gmail.com";
+  const emailResponsavel = PropertiesService.getScriptProperties().getProperty('EMAILRESP');
 
   // --- Formatting Responses for Email ---
   const respostasForm = Object.entries(e.namedValues).map(([pergunta, resposta]) => `${pergunta}: ${resposta[0]}`).join('<br>');
 
   // --- Create Button to Change Status ---
-  const urlBaseApp = 'https://script.google.com/macros/s/AKfycbyF2t956Z4kV6vN2qYilqzKfUbdd4g9hLNXWztOVpN6Rac9Av73y-h5tgl_a_V5lfv5/exec';
+  const urlBaseApp = PropertiesService.getScriptProperties().getProperty('URL_WEB_APP');
+  '';
 
   const linkConfirmar = `${urlBaseApp}?action=updateStatus&row=${responseRow}&status=Confirmado`;
   const assunto = 'Confirmação de Resposta e Acompanhamento';
@@ -52,7 +54,8 @@ function onFormSubmit(e) {
     <p>${respostasForm}</p>
     <br><br>
     <p>Atenciosamente,</p>
-    <p>VISCO :)</p>`;
+    <p>VISCO :)</p>
+    `;
 
   const emailBodyResponsavel = `
     <p><b>Para o Administrador (Você):</b></p>
@@ -61,7 +64,8 @@ function onFormSubmit(e) {
     <a href="${linkConfirmar}" style="background-color:#4CAF50;color:white;padding:10px 20px;text-align:center;text-decoration:none;display:inline-block;border-radius:5px;">Marcar como Confirmado</a>
     <br><br>
     <p>Atenciosamente,</p>
-    <p>VISCO :)</p>`;
+    <p>VISCO :)</p>
+    `;
 
   // --- Send Emails ---
   try {
